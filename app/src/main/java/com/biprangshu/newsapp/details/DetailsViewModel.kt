@@ -8,6 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.biprangshu.newsapp.domain.model.Article
 import com.biprangshu.newsapp.domain.usecases.NewsUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,20 +19,31 @@ import javax.inject.Inject
 class DetailsViewModel @Inject constructor(
     private val newsUseCases: NewsUseCases
 ) : ViewModel() {
+    private val _state = MutableStateFlow(DetailsState())
+    val state: StateFlow<DetailsState> = _state.asStateFlow()
 
     var sideEffect by mutableStateOf<String?>(null)
         private set
 
     fun onEvent(event: DetailsEvent){
-        when(event){
+        when(event) {
             is DetailsEvent.UpsertDeleteArticle ->{
                 viewModelScope.launch {
                     val article = newsUseCases.selectArticle(event.article.url)
-                    if(article==null){
+                    if (article==null) {
                         upsertArticle(event.article)
-                    }else{
+                        _state.update { it.copy(isBookmarked = true) }
+                    } else{
                         deleteArticle(event.article)
+                        _state.update { it.copy(isBookmarked = false) }
                     }
+                }
+            }
+
+            is DetailsEvent.LoadArticle -> {
+                viewModelScope.launch {
+                    val article = newsUseCases.selectArticle(event.url)
+                    _state.update { it.copy(isBookmarked = article != null) }
                 }
             }
 
@@ -36,7 +51,6 @@ class DetailsViewModel @Inject constructor(
                 sideEffect=null
             }
         }
-
     }
 
     private suspend fun deleteArticle(article: Article) {

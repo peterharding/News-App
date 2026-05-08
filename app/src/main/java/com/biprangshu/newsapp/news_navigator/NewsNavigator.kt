@@ -7,6 +7,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -123,14 +125,19 @@ fun NewsNavigator(
             }
             composable(Route.DetailsScreen.Route) {
                 val viewModel: DetailsViewModel = hiltViewModel()
+                val state by viewModel.state.collectAsState()
                 // Side effect handling remains the same
                 if (viewModel.sideEffect != null) {
                     Toast.makeText(LocalContext.current, viewModel.sideEffect, Toast.LENGTH_LONG).show()
                     viewModel.onEvent(DetailsEvent.RemoveSideEffect)
                 }
                 navController.previousBackStackEntry?.savedStateHandle?.get<Article?>("article")?.let { article ->
+                    LaunchedEffect(article.url) {
+                        viewModel.onEvent(DetailsEvent.LoadArticle(article.url))
+                    }
                     DetailsScreen(
                         article = article,
+                        state = state,
                         event = viewModel::onEvent,
                         navigateUp = { navController.navigateUp() }
                     )

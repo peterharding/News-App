@@ -22,6 +22,7 @@ import com.biprangshu.newsapp.ui.theme.NewsAppTheme
 @Composable
 fun DetailsTopBar(
     modifier: Modifier = Modifier,
+    isBookmarked: Boolean,
     onBrowsingClick: ()-> Unit,
     onShareClick: () -> Unit,
     onBookMarkClick: () -> Unit,
@@ -42,7 +43,11 @@ fun DetailsTopBar(
         },
         actions = {
             IconButton(onClick = onBookMarkClick) {
-                Icon(painter = painterResource(id = R.drawable.ic_bookmark), contentDescription = null)
+                if (isBookmarked) {
+                    Icon(painter = painterResource(id = R.drawable.ic_bookmark), tint = Color.Red, contentDescription = null)
+                } else {
+                    Icon(painter = painterResource(id = R.drawable.ic_bookmark), contentDescription = null)
+                }
             }
             IconButton(onClick = onShareClick) {
                 Icon(imageVector = Icons.Default.Share, contentDescription = null)
@@ -61,10 +66,10 @@ fun DetailsTopBar(
 private fun DetailTopBarPreview() {
     NewsAppTheme {
         DetailsTopBar(
+            isBookmarked = false,
             onBrowsingClick = { /*TODO*/ },
             onShareClick = { /*TODO*/ },
-            onBookMarkClick = { /*TODO*/ }) {
-            
-        }
+            onBookMarkClick = { /*TODO*/ }
+        ) { }
     }
 }

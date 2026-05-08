@@ -31,6 +31,7 @@ import com.biprangshu.newsapp.ui.theme.Montserrat
 @Composable
 fun DetailsScreen(
     modifier: Modifier = Modifier, // Apply modifier to the root Column
+    state: DetailsState,
     article: Article,
     event: (DetailsEvent) -> Unit,
     navigateUp: () -> Unit
@@ -46,6 +47,7 @@ fun DetailsScreen(
         ) {
             // Use the existing DetailsTopBar component
             DetailsTopBar(
+                isBookmarked = state.isBookmarked,
                 onBrowsingClick = {
                     Intent(Intent.ACTION_VIEW).also {
                         it.data = Uri.parse(article.url)
