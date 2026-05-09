@@ -28,6 +28,7 @@ import com.biprangshu.newsapp.HomeViewModel
 import com.biprangshu.newsapp.R // Keep R import for Drawables
 import com.biprangshu.newsapp.SearchScreen
 import com.biprangshu.newsapp.SearchViewModel
+import com.biprangshu.newsapp.bookmark.BookMarkEvent
 import com.biprangshu.newsapp.bookmark.BookMarkScreen
 import com.biprangshu.newsapp.bookmark.BookMarkViewModel
 import com.biprangshu.newsapp.details.DetailsEvent
@@ -146,8 +147,13 @@ fun NewsNavigator(
             composable(Route.BookMarkScreen.Route) {
                 val viewModel: BookMarkViewModel = hiltViewModel()
                 val state = viewModel.state.value
+                if (viewModel.sideEffect != null) {
+                    Toast.makeText(LocalContext.current, viewModel.sideEffect, Toast.LENGTH_SHORT).show()
+                    viewModel.onEvent(BookMarkEvent.RemoveSideEffect)
+                }
                 BookMarkScreen(
                     state = state,
+                    event = viewModel::onEvent,
                     navigateToDetails = { article ->
                         NavigateToDetails(navController = navController, article = article)
                     }
