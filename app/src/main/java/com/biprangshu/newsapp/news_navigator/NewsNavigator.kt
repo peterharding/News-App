@@ -143,7 +143,8 @@ fun NewsNavigator(
                     state = state,
                     navigateToDetails = { article ->
                         NavigateToDetails(navController = navController, article = article)
-                    }
+                    },
+                    event = viewModel::onEvent
                 )
             }
         }
